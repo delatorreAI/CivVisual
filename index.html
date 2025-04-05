@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlas Interactivo de Civilizaciones Antiguas</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;800&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-texture"></div>
+
+    <header class="main-header" role="banner">
+        <div class="container header-container">
+            <div class="header-content">
+                <h1 class="title-main">Atlas de Civilizaciones Antiguas</h1>
+                <div class="subtitle">
+                    <span class="time-range">10,000 a.C. - 750 d.C.</span>
+                    <div class="mini-timeline" aria-hidden="true">
+                        <div class="timeline-marker" style="left: 0%;" title="10,000 a.C."></div>
+                        <div class="timeline-marker" style="left: 25%;" title="~7,500 a.C."></div>
+                        <div class="timeline-marker" style="left: 50%;" title="~5,000 a.C."></div>
+                        <div class="timeline-marker" style="left: 75%;" title="~2,500 a.C."></div>
+                        <div class="timeline-marker" style="left: 93%;" title="Año 0"></div> <div class="timeline-marker" style="left: 100%;" title="750 d.C."></div>
+                    </div>
+                </div>
+            </div>
+            </div>
+    </header>
+
+    <main class="container main-container" role="main">
+
+        <section class="summary-card card" aria-labelledby="stats-title">
+            <div class="card-body">
+                 <div class="stat-cards">
+                     <div class="stat-card">
+                         <div class="stat-icon"><i class="fas fa-landmark" aria-hidden="true"></i></div>
+                         <div class="stat-details">
+                             <div class="stat-value" id="total-civilizaciones">0</div>
+                             <div class="stat-label">Civilizaciones</div>
+                         </div>
+                     </div>
+                     <div class="stat-card">
+                         <div class="stat-icon"><i class="fas fa-globe-americas" aria-hidden="true"></i></div>
+                         <div class="stat-details">
+                             <div class="stat-value" id="total-continentes">0</div>
+                             <div class="stat-label">Continentes</div>
+                         </div>
+                     </div>
+                     <div class="stat-card">
+                         <div class="stat-icon"><i class="fas fa-map-marked-alt" aria-hidden="true"></i></div>
+                         <div class="stat-details">
+                             <div class="stat-value" id="total-regiones">0</div>
+                             <div class="stat-label">Regiones</div>
+                         </div>
+                     </div>
+                     <div class="stat-card">
+                         <div class="stat-icon"><i class="fas fa-hourglass-half" aria-hidden="true"></i></div>
+                         <div class="stat-details">
+                             <div class="stat-value" id="rango-temporal">-</div>
+                             <div class="stat-label">Rango Temporal</div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </section>
+
+        <section class="data-status-card card" aria-labelledby="data-source-title">
+            <div class="card-header">
+                <h2 class="card-title" id="data-source-title"><i class="fas fa-database" aria-hidden="true"></i> Fuente de Datos</h2>
+            </div>
+            <div class="card-body">
+                <div class="file-upload">
+                    <div class="upload-status" id="upload-status" role="status" aria-live="polite">
+                        <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Iniciando carga automática...
+                    </div>
+                    <details class="manual-upload-details">
+                        <summary><i class="fas fa-upload" aria-hidden="true"></i> Carga manual (si la automática falla)</summary>
+                        <div class="manual-upload-container">
+                            <p id="file-label">Selecciona el archivo CSV (`matriz.csv`):</p>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="csv-file" accept=".csv" aria-labelledby="file-label">
+                                <button type="button" class="btn btn-secondary" onclick="document.getElementById('csv-file').click();">
+                                     <i class="fas fa-file-csv" aria-hidden="true"></i> Seleccionar archivo
+                                 </button>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+         <div id="app-error-message" role="alert" style="display: none; margin-bottom: var(--spacing-lg);"></div>
+
+        <nav class="main-navigation" aria-label="Secciones principales">
+            <button class="nav-tab active" data-tab="tabla" role="tab" aria-selected="true" aria-controls="tabla-content">
+                <i class="fas fa-table" aria-hidden="true"></i>
+                <span>Tabla</span>
+            </button>
+            <button class="nav-tab" data-tab="visualizacion" role="tab" aria-selected="false" aria-controls="visualizacion-content">
+                <i class="fas fa-chart-pie" aria-hidden="true"></i>
+                <span>Gráficos</span>
+            </button>
+            <button class="nav-tab" data-tab="comparativa" role="tab" aria-selected="false" aria-controls="comparativa-content">
+                <i class="fas fa-balance-scale" aria-hidden="true"></i>
+                <span>Comparativa</span>
+            </button>
+            <button class="nav-tab" data-tab="cronologia" role="tab" aria-selected="false" aria-controls="cronologia-content">
+                <i class="fas fa-stream" aria-hidden="true"></i>
+                <span>Cronología</span>
+            </button>
+        </nav>
+
+        <div role="tabpanel" id="tabla-content" class="tab-content active">
+            <section class="card filter-card" aria-labelledby="filter-title">
+                <div class="card-header">
+                    <h2 class="card-title" id="filter-title"><i class="fas fa-filter" aria-hidden="true"></i> Filtrar Civilizaciones</h2>
+                    <div class="card-actions">
+                         <button class="btn-icon btn-action" id="toggle-filters-btn" title="Mostrar/Ocultar filtros" aria-expanded="true" aria-controls="filter-container-id">
+                            <i class="fas fa-chevron-up"></i> </button>
+                    </div>
+                </div>
+                <div class="card-body filter-container" id="filter-container-id"> <div class="search-container">
+                        <label for="search-input" class="visually-hidden">Buscar texto libre</label> <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                        <input type="text" class="search-bar" id="search-input" placeholder="Buscar por cultura, tecnología, arquitectura...">
+                    </div>
+
+                    <div class="filters-grid">
+                         <div class="filter-group">
+                            <label for="continente-filter"><i class="fas fa-globe" aria-hidden="true"></i> Continente</label>
+                            <div class="select-wrapper">
+                                <select id="continente-filter" aria-label="Filtrar por Continente">
+                                    <option value="">Todos</option>
+                                </select>
+                                <i class="fas fa-chevron-down select-icon" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                         <div class="filter-group">
+                            <label for="region-filter"><i class="fas fa-map" aria-hidden="true"></i> Región</label>
+                            <div class="select-wrapper">
+                                <select id="region-filter" aria-label="Filtrar por Región">
+                                    <option value="">Todas</option>
+                                </select>
+                                <i class="fas fa-chevron-down select-icon" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                         <div class="filter-group">
+                            <label for="subsistencia-filter"><i class="fas fa-seedling" aria-hidden="true"></i> Subsistencia</label>
+                            <div class="select-wrapper">
+                                <select id="subsistencia-filter" aria-label="Filtrar por Subsistencia">
+                                    <option value="">Todas</option>
+                                </select>
+                                <i class="fas fa-chevron-down select-icon" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                         <div class="filter-group">
+                            <label for="period-filter"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Período</label>
+                            <div class="select-wrapper">
+                                <select id="period-filter" aria-label="Filtrar por Período">
+                                    <option value="">Todos</option>
+                                    <option value="10000-8000">10000-8000 a.C.</option>
+                                    <option value="8000-6000">8000-6000 a.C.</option>
+                                    <option value="6000-4000">6000-4000 a.C.</option>
+                                    <option value="4000-2000">4000-2000 a.C.</option>
+                                    <option value="2000-1000">2000-1000 a.C.</option>
+                                    <option value="1000-0">1000-0 a.C.</option>
+                                    <option value="0-500">0-500 d.C.</option>
+                                    <option value="500-750">500-750 d.C.</option>
+                                </select>
+                                <i class="fas fa-chevron-down select-icon" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column-toggle-container">
+                        <h3 class="toggle-title"><i class="fas fa-columns" aria-hidden="true"></i> Columnas Visibles</h3>
+                        <div class="column-toggle" id="column-toggle" role="group" aria-labelledby="toggle-title">
+                            </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="btn btn-secondary" id="reset-filters">
+                            <i class="fas fa-undo" aria-hidden="true"></i> Reiniciar Filtros
+                        </button>
+                        </div>
+                </div>
+            </section>
+
+            <section class="card data-table-card" aria-labelledby="table-title">
+                <div class="card-header">
+                    <h2 class="card-title" id="table-title"><i class="fas fa-scroll" aria-hidden="true"></i> Civilizaciones Encontradas</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary btn-icon" id="export-btn" title="Exportar datos filtrados a CSV" aria-label="Exportar a CSV">
+                            <i class="fas fa-file-csv" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="civilizaciones-table" class="data-table" aria-live="polite">
+                            <thead>
+                                <tr><th>Cargando encabezados...</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="loading">Cargando datos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav class="pagination-container" aria-label="Paginación de la tabla">
+                        <div class="pagination" id="pagination">
+                            </div>
+                    </nav>
+                </div>
+            </section>
+        </div><div role="tabpanel" id="visualizacion-content" class="tab-content">
+            <section class="visualization-intro" aria-label="Introducción a Gráficos">
+                <h3><i class="fas fa-chart-pie" aria-hidden="true"></i> Exploración Gráfica</h3>
+                <p>Descubre patrones en la distribución geográfica, temporal y por subsistencia de las civilizaciones.</p>
+            </section>
+            <section class="card viz-card" aria-labelledby="continent-chart-title">
+                <div class="card-header">
+                    <h3 class="card-title" id="continent-chart-title"><i class="fas fa-th-large" aria-hidden="true"></i> Distribución por Continente y Subsistencia</h3>
+                    </div>
+                <div class="card-body"><div class="chart-container"><canvas id="continent-chart"></canvas></div></div>
+            </section>
+            <section class="card viz-card" aria-labelledby="timeline-chart-title">
+                <div class="card-header">
+                    <h3 class="card-title" id="timeline-chart-title"><i class="fas fa-hourglass" aria-hidden="true"></i> Distribución Temporal Simple</h3>
+                    </div>
+                <div class="card-body"><div class="chart-container"><canvas id="timeline-chart"></canvas></div></div>
+            </section>
+        </div><div role="tabpanel" id="comparativa-content" class="tab-content">
+             <section class="visualization-intro" aria-label="Introducción a Comparativa">
+                <h3><i class="fas fa-balance-scale" aria-hidden="true"></i> Análisis Comparativo</h3>
+                <p>Explora correlaciones entre subsistencia, tecnología y otros factores culturales.</p>
+            </section>
+             <section class="card viz-card" aria-labelledby="correlation-chart-title">
+                <div class="card-header">
+                    <h3 class="card-title" id="correlation-chart-title"><i class="fas fa-project-diagram" aria-hidden="true"></i> Correlación Subsistencia-Tecnología</h3>
+                     </div>
+                <div class="card-body"><div class="chart-container"><canvas id="correlation-chart"></canvas></div></div>
+            </section>
+             <section class="card viz-card" aria-labelledby="writing-chart-title">
+                <div class="card-header">
+                    <h3 class="card-title" id="writing-chart-title"><i class="fas fa-pen-nib" aria-hidden="true"></i> Desarrollo de Escritura por Región</h3>
+                     </div>
+                <div class="card-body"><div class="chart-container"><canvas id="writing-chart"></canvas></div></div>
+            </section>
+        </div><div role="tabpanel" id="cronologia-content" class="tab-content">
+             <section class="visualization-intro" aria-label="Introducción a Cronología Avanzada">
+                 <h3><i class="fas fa-stream" aria-hidden="true"></i> Cronología Avanzada</h3>
+                 <p>Visualiza el flujo temporal de las civilizaciones. (Esta sección usa la visualización original 'Ríos del Tiempo').</p>
+             </section>
+             <section class="card viz-card" aria-labelledby="timeline-viz-title">
+                 <div class="card-header">
+                     <h3 class="card-title" id="timeline-viz-title"><i class="fas fa-water" aria-hidden="true"></i> Visualización Cronológica: Ríos del Tiempo</h3>
+                      </div>
+                 <div class="card-body">
+                      <div id="timeline-viz-controls" class="viz-controls">
+                          </div>
+                      <div class="chart-container timeline-viz-container">
+                          <canvas id="timeline-viz-canvas"></canvas>
+                      </div>
+                 </div>
+             </section>
+              <section class="card viz-card" aria-labelledby="timeline-legend-title">
+                 <div class="card-header">
+                     <h3 class="card-title" id="timeline-legend-title"><i class="fas fa-info-circle"></i> Leyenda y Contexto</h3>
+                 </div>
+                 <div class="card-body">
+                     <div class="timeline-legend">
+                         <h4>Interpretación</h4>
+                         <p>Los "ríos" representan civilizaciones...</p>
+                         <div class="legend-items"> </div>
+                         <div class="timeline-tip"> </div>
+                     </div>
+                 </div>
+             </section>
+        </div></main><footer class="main-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p>${APP_NAME || 'Atlas'} v${APP_VERSION || '?'}</p>
+                    <p><i class="fas fa-calendar-alt" aria-hidden="true"></i> Rango: 10,000 a.C. - 750 d.C.</p>
+                </div>
+                <div class="footer-credits">
+                    <p><i class="fas fa-code" aria-hidden="true"></i> Desarrollado con <span class="heart">❤</span></p>
+                    </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="modal-overlay" class="modal-overlay" aria-hidden="true"></div>
+    <div id="detail-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-header">
+            <h3 id="modal-title">Detalles de Civilización</h3>
+            <button class="modal-close" id="modal-close" aria-label="Cerrar modal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="modal-content">
+            <p>Cargando detalles...</p>
+        </div>
+    </div>
+
+    <div id="notification-container" class="notification-container" role="region" aria-live="assertive"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.2.1/chartjs-plugin-zoom.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="js/config.js"></script>   <script src="js/utils.js"></script>    <script src="js/data.js"></script>     <script src="js/ui.js"></script>      <script src="js/table.js"></script>    <script src="js/charts.js"></script>   <script src="js/timeline-viz.js"></script> <script src="js/main.js"></script>     </body>
+</html>

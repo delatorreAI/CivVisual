@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estratos Temporales Interactivos (v9) - Atlas</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Source+Sans+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <div class="container estratos-viz-area" style="padding-top: 1rem; padding-bottom: 3rem;">
+
+        <header class="main-header" role="banner" style="margin-bottom: var(--spacing-lg);">
+             <div class="container header-container">
+                 <div class="header-content">
+                     <h1 class="title-main">Estratos Temporales Interactivos</h1>
+                     <div class="subtitle">
+                         <span>Exploraci¨®n Cronol¨®gica de Civilizaciones</span>
+                     </div>
+                 </div>
+             </div>
+         </header>
+
+        <section id="estratos-controls-section" class="card viz-controls" aria-labelledby="controls-title">
+             <header class="card-header">
+                 <h2 class="card-title" id="controls-title"><i class="fas fa-sliders-h" aria-hidden="true"></i> Controles</h2>
+             </header>
+             <div class="card-body">
+                 <fieldset class="zoom-controls" aria-labelledby="zoom-label">
+                     <legend id="zoom-label" class="controls-label">Zoom Temporal:</legend>
+                     <button id="zoom-out-btn" class="btn btn-secondary btn-icon" title="Alejar" aria-label="Alejar Zoom">
+                         <i class="fas fa-search-minus" aria-hidden="true"></i>
+                     </button>
+                     <button id="reset-zoom-btn" class="btn btn-secondary" title="Resetear Zoom" aria-label="Resetear Zoom">
+                         <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i> Vista Completa
+                     </button>
+                     <button id="zoom-in-btn" class="btn btn-secondary btn-icon" title="Acercar" aria-label="Acercar Zoom">
+                         <i class="fas fa-search-plus" aria-hidden="true"></i>
+                     </button>
+                 </fieldset>
+
+                 <fieldset class="display-options" aria-labelledby="options-label">
+                      <legend id="options-label" class="controls-label">Opciones:</legend>
+                      <label for="toggle-periods-btn">
+                          <input type="checkbox" id="toggle-periods-btn" checked>
+                          <span>Bandas de Periodo</span>
+                      </label>
+                      <label for="toggle-hover-icons-btn">
+                          <input type="checkbox" id="toggle-hover-icons-btn" checked>
+                          <span>Iconos en Hover</span>
+                      </label>
+                      </fieldset>
+             </div>
+        </section>
+
+        <section id="estratos-chart-section" class="card" aria-labelledby="chart-title-hidden">
+             <h2 id="chart-title-hidden" class="visually-hidden">L¨ªnea de Tiempo Estratificada</h2>
+              {/* Estilo inline mantenido, idealmente mover a #estratos-chart-wrapper .card-body en CSS */}
+             <div class="card-body" style="padding: 0; position: relative;">
+                 <div id="estratos-loading-message" role="status" aria-live="polite" style="display: block;">
+                     Cargando visualizaci¨®n...
+                 </div>
+                 <canvas id="estratos-timeline-canvas" role="img" aria-label="L¨ªnea de tiempo de civilizaciones"></canvas>
+             </div>
+        </section>
+
+        <div id="estratos-tooltip" role="tooltip" aria-hidden="true" style="display: none; opacity: 0; position: fixed;"></div>
+
+        <section id="estratos-legend-section" class="card viz-legend" aria-labelledby="legend-title">
+             <header class="card-header">
+                 <h2 class="card-title" id="legend-title"><i class="fas fa-info-circle" aria-hidden="true"></i> Leyenda</h2>
+             </header>
+             <div class="card-body">
+                 <div id="legend-content-placeholder">
+                     <p>Cargando leyenda...</p>
+                 </div>
+             </div>
+        </section>
+
+    </div><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.2.1/chartjs-plugin-zoom.min.js" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+
+    <script src="js/config.js" defer></script>
+    <script src="js/utils.js" defer></script>
+    <script src="js/data.js" defer></script>
+    <script src="js/estratos-timeline.js" defer></script>
+
+    </body>
+</html>

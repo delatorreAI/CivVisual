@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronología Global de Civilizaciones</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos específicos para esta visualización, pero usando las variables del CSS principal */
+        .timeline-global-container {
+            padding: var(--spacing-lg);
+            background-color: var(--color-background);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-border);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .continent-timeline {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .continent-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-xs);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .continent-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--spacing-md);
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .continent-name {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-primary-dark);
+        }
+
+        .continent-stats {
+            margin-left: auto;
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+        }
+
+        .timeline-rulers {
+            position: relative;
+            height: 30px;
+            margin-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .time-marker {
+            position: absolute;
+            bottom: 0;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--color-text-light);
+        }
+
+        .time-marker::after {
+            content: '';
+            display: block;
+            width: 1px;
+            height: 8px;
+            background-color: var(--color-border);
+            margin: 4px auto 0;
+        }
+
+        .civilizations-container {
+            position: relative;
+        }
+
+        .civilization-timeline {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+            height: 40px;
+        }
+
+        .civilization-name {
+            width: 200px;
+            font-weight: 600;
+            padding-right: var(--spacing-md);
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .timeline-bar-container {
+            flex: 1;
+            position: relative;
+            height: 100%;
+        }
+
+        .timeline-bar {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .timeline-bar:hover {
+            transform: translateY(-50%) translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .civilization-tooltip {
+            position: absolute;
+            background-color: var(--color-surface);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--color-border);
+            padding: var(--spacing-md);
+            box-shadow: var(--shadow-md);
+            z-index: 100;
+            max-width: 300px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .civilization-tooltip h4 {
+            margin-bottom: var(--spacing-xs);
+            color: var(--color-primary-dark);
+        }
+
+        .civilization-tooltip p {
+            margin-bottom: var(--spacing-xs);
+            font-size: 0.9rem;
+        }
+
+        .timeline-bar:hover + .civilization-tooltip {
+            opacity: 1;
+        }
+
+        .filter-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            align-items: center;
+        }
+
+        .filter-tools .filter-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-tools label {
+            margin-right: var(--spacing-sm);
+            white-space: nowrap;
+        }
+
+        .timeline-info {
+            text-align: center;
+            color: var(--color-text-light);
+            font-size: 0.9rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .scale-indicator {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--color-text-light);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* Colores específicos para continentes */
+        .icon-africa { background-color: var(--color-africa); }
+        .icon-asia { background-color: var(--color-asia); }
+        .icon-europa { background-color: var(--color-europa); }
+        .icon-america-norte { background-color: var(--color-america-norte); }
+        .icon-america-sur { background-color: var(--color-america-sur); }
+        .icon-oceania { background-color: var(--color-oceania); }
+
+        /* Estilos para barras */
+        .bar-africa { background-color: rgba(140, 163, 54, 0.7); border: 1px solid var(--color-africa); }
+        .bar-asia { background-color: rgba(196, 138, 70, 0.7); border: 1px solid var(--color-asia); }
+        .bar-europa { background-color: rgba(77, 120, 148, 0.7); border: 1px solid var(--color-europa); }
+        .bar-america-norte { background-color: rgba(163, 86, 77, 0.7); border: 1px solid var(--color-america-norte); }
+        .bar-america-sur { background-color: rgba(146, 90, 136, 0.7); border: 1px solid var(--color-america-sur); }
+        .bar-oceania { background-color: rgba(74, 140, 148, 0.7); border: 1px solid var(--color-oceania); }
+
+        .timeline-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            justify-content: center;
+        }
+
+        .timeline-legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 12px;
+            margin-right: var(--spacing-sm);
+            border-radius: 2px;
+        }
+
+        .zoom-controls {
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-texture"></div>
+    
+    <header class="main-header">
+        <div class="container header-container">
+            <div class="header-content">
+                <h1 class="title-main">Cronología Global de Civilizaciones</h1>
+                <div class="subtitle">
+                    <span class="time-range">10,000 a.C. - 750 d.C.</span>
+                    <div class="mini-timeline">
+                        <div class="timeline-marker" style="left: 0%;" title="10,000 a.C."></div>
+                        <div class="timeline-marker" style="left: 25%;" title="7,500 a.C."></div>
+                        <div class="timeline-marker" style="left: 50%;" title="5,000 a.C."></div>
+                        <div class="timeline-marker" style="left: 75%;" title="2,500 a.C."></div>
+                        <div class="timeline-marker" style="left: 90%;" title="0"></div>
+                        <div class="timeline-marker" style="left: 100%;" title="750 d.C."></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container main-container">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-clock"></i> Vista Cronológica Global</div>
+                <div class="card-actions">
+                    <a href="index.html" class="btn-icon" title="Volver a la vista principal">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="visualization-intro">
+                    <h3><i class="fas fa-globe-americas"></i> Cronología comparativa por continentes</h3>
+                    <p>Esta visualización muestra la línea de tiempo de las principales civilizaciones antiguas agrupadas por continente, permitiendo comparar su desarrollo y coexistencia a lo largo de la historia.</p>
+                </div>
+
+                <div class="filter-tools">
+                    <div class="filter-group">
+                        <label for="continent-filter"><i class="fas fa-filter"></i> Continentes:</label>
+                        <div class="select-wrapper">
+                            <select id="continent-filter">
+                                <option value="all">Todos</option>
+                                <option value="africa">África</option>
+                                <option value="asia">Asia</option>
+                                <option value="europa">Europa</option>
+                                <option value="america-norte">América del Norte</option>
+                                <option value="america-sur">América del Sur</option>
+                                <option value="oceania">Oceanía</option>
+                            </select>
+                            <i class="fas fa-chevron-down select-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="highlight-filter"><i class="fas fa-highlighter"></i> Destacar:</label>
+                        <div class="select-wrapper">
+                            <select id="highlight-filter">
+                                <option value="none">Ninguno</option>
+                                <option value="writing">Sistemas de escritura</option>
+                                <option value="architecture">Arquitectura monumental</option>
+                                <option value="technology">Tecnologías clave</option>
+                                <option value="social">Organización estatal</option>
+                            </select>
+                            <i class="fas fa-chevron-down select-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="zoom-controls">
+                        <button class="btn-secondary" id="zoom-out-btn">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="btn-secondary" id="reset-zoom-btn">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn-secondary" id="zoom-in-btn">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="timeline-legend">
+                    <div class="timeline-legend-item">
+                        <div class="legend-color bar-africa"></div>
+                        <span>África</span>
+                    </div>
+                    <div class="timeline-legend-item">
+                        <div class="legend-color bar-asia"></div>
+                        <span>Asia</span>
+                    </div>
+                    <div class="timeline-legend-item">
+                        <div class="legend-color bar-europa"></div>
+                        <span>Europa</span>
+                    </div>
+                    <div class="timeline-legend-item">
+                        <div class="legend-color bar-america-norte"></div>
+                        <span>América del Norte</span>
+                    </div>
+                    <div class="timeline-legend-item">
+                        <div class="legend-color bar-america-sur"></div>
+                        <span>América del Sur</span>
+                    </div>
+                    <div class="timeline-legend-item">
+                        <div class="legend-color bar-oceania"></div>
+                        <span>Oceanía</span>
+                    </div>
+                </div>
+
+                <div class="timeline-info">
+                    <p><i class="fas fa-info-circle"></i> Pasa el cursor sobre las barras para ver detalles. Utiliza los controles de zoom para explorar períodos específicos.</p>
+                </div>
+
+                <div class="timeline-global-container">
+                    <!-- Aquí comenzará la visualización de la línea de tiempo -->
+                    
+                    <!-- Reglas de tiempo -->
+                    <div class="timeline-rulers">
+                        <div class="time-marker" style="left: 0%;">10000 a.C.</div>
+                        <div class="time-marker" style="left: 20%;">8000 a.C.</div>
+                        <div class="time-marker" style="left: 40%;">6000 a.C.</div>
+                        <div class="time-marker" style="left: 60%;">4000 a.C.</div>
+                        <div class="time-marker" style="left: 80%;">2000 a.C.</div>
+                        <div class="time-marker" style="left: 90%;">0</div>
+                        <div class="time-marker" style="left: 100%;">750 d.C.</div>
+                    </div>
+
+                    <!-- Cronología de África -->
+                    <div class="continent-timeline" id="africa-timeline">
+                        <div class="continent-header">
+                            <div class="continent-icon icon-africa">
+                                <i class="fas fa-globe-africa"></i>
+                            </div>
+                            <h3 class="continent-name">África</h3>
+                            <div class="continent-stats">42 civilizaciones documentadas</div>
+                        </div>
+
+                        <div class="civilizations-container">
+                            <!-- Ejemplo de barras de tiempo para África -->
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Egipto Antiguo</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-africa" style="left: 60%; width: 30%;" data-civilization="egipto"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Egipto Antiguo</h4>
+                                        <p><strong>Período:</strong> 3100 a.C. - 332 a.C.</p>
+                                        <p><strong>Región:</strong> Valle del Nilo</p>
+                                        <p><strong>Características:</strong> Arquitectura monumental, sistemas de escritura jeroglífica, organización estatal centralizada</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Nubia / Kush</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-africa" style="left: 70%; width: 20%;" data-civilization="nubia"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Nubia / Kush</h4>
+                                        <p><strong>Período:</strong> 2500 a.C. - 350 d.C.</p>
+                                        <p><strong>Región:</strong> Alto Nilo</p>
+                                        <p><strong>Características:</strong> Pirámides, comercio con Egipto, metalurgia del hierro</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Civilización Nok</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-africa" style="left: 84%; width: 7%;" data-civilization="nok"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Civilización Nok</h4>
+                                        <p><strong>Período:</strong> 1000 a.C. - 300 a.C.</p>
+                                        <p><strong>Región:</strong> Nigeria Central</p>
+                                        <p><strong>Características:</strong> Esculturas en terracota, metalurgia del hierro</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cronología de Asia -->
+                    <div class="continent-timeline" id="asia-timeline">
+                        <div class="continent-header">
+                            <div class="continent-icon icon-asia">
+                                <i class="fas fa-globe-asia"></i>
+                            </div>
+                            <h3 class="continent-name">Asia</h3>
+                            <div class="continent-stats">78 civilizaciones documentadas</div>
+                        </div>
+
+                        <div class="civilizations-container">
+                            <!-- Ejemplo de barras de tiempo para Asia -->
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Mesopotamia</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-asia" style="left: 59%; width: 28%;" data-civilization="mesopotamia"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Mesopotamia</h4>
+                                        <p><strong>Período:</strong> 3500 a.C. - 539 a.C.</p>
+                                        <p><strong>Región:</strong> Entre ríos Tigris y Éufrates</p>
+                                        <p><strong>Características:</strong> Primeras ciudades, escritura cuneiforme, organización política compleja</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Valle del Indo</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-asia" style="left: 62%; width: 12%;" data-civilization="indo"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Civilización del Valle del Indo</h4>
+                                        <p><strong>Período:</strong> 3300 a.C. - 1300 a.C.</p>
+                                        <p><strong>Región:</strong> Subcontinente indio</p>
+                                        <p><strong>Características:</strong> Planeamiento urbano, sistemas de alcantarillado, posible escritura</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">China Antigua</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-asia" style="left: 65%; width: 30%;" data-civilization="china"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>China Antigua</h4>
+                                        <p><strong>Período:</strong> 2700 a.C. - 221 a.C.</p>
+                                        <p><strong>Región:</strong> China oriental, valle del río Amarillo</p>
+                                        <p><strong>Características:</strong> Escritura en huesos oraculares, bronce ritual, sistema político dinástico</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cronología de Europa -->
+                    <div class="continent-timeline" id="europa-timeline">
+                        <div class="continent-header">
+                            <div class="continent-icon icon-europa">
+                                <i class="fas fa-globe-europe"></i>
+                            </div>
+                            <h3 class="continent-name">Europa</h3>
+                            <div class="continent-stats">56 civilizaciones documentadas</div>
+                        </div>
+
+                        <div class="civilizations-container">
+                            <!-- Ejemplo de barras de tiempo para Europa -->
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Minoica</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-europa" style="left: 72%; width: 10%;" data-civilization="minoica"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Civilización Minoica</h4>
+                                        <p><strong>Período:</strong> 2700 a.C. - 1100 a.C.</p>
+                                        <p><strong>Región:</strong> Creta</p>
+                                        <p><strong>Características:</strong> Palacios complejos, arte naturalista, escritura Lineal A</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Micénica</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-europa" style="left: 75%; width: 7%;" data-civilization="micenica"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Civilización Micénica</h4>
+                                        <p><strong>Período:</strong> 1600 a.C. - 1100 a.C.</p>
+                                        <p><strong>Región:</strong> Grecia continental</p>
+                                        <p><strong>Características:</strong> Ciudadelas fortificadas, escritura Lineal B, tumbas de pozo</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Grecia Clásica</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-europa" style="left: 85%; width: 8%;" data-civilization="grecia"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Grecia Clásica</h4>
+                                        <p><strong>Período:</strong> 800 a.C. - 146 a.C.</p>
+                                        <p><strong>Región:</strong> Península griega y Egeo</p>
+                                        <p><strong>Características:</strong> Democracia, filosofía, arquitectura clásica</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cronología de América del Norte -->
+                    <div class="continent-timeline" id="america-norte-timeline">
+                        <div class="continent-header">
+                            <div class="continent-icon icon-america-norte">
+                                <i class="fas fa-globe-americas"></i>
+                            </div>
+                            <h3 class="continent-name">América del Norte</h3>
+                            <div class="continent-stats">35 civilizaciones documentadas</div>
+                        </div>
+
+                        <div class="civilizations-container">
+                            <!-- Ejemplo de barras de tiempo para América del Norte -->
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Olmeca</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-america-norte" style="left: 82%; width: 6%;" data-civilization="olmeca"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Civilización Olmeca</h4>
+                                        <p><strong>Período:</strong> 1400 a.C. - 400 a.C.</p>
+                                        <p><strong>Región:</strong> Golfo de México</p>
+                                        <p><strong>Características:</strong> Cabezas colosales, primeros centros ceremoniales, posible escritura temprana</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Teotihuacán</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-america-norte" style="left: 90%; width: 7%;" data-civilization="teotihuacan"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Teotihuacán</h4>
+                                        <p><strong>Período:</strong> 100 a.C. - 550 d.C.</p>
+                                        <p><strong>Región:</strong> Valle de México</p>
+                                        <p><strong>Características:</strong> Planeamiento urbano a gran escala, pirámides monumentales, organización estatal</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="civilization-timeline">
+                                <div class="civilization-name">Maya Clásico</div>
+                                <div class="timeline-bar-container">
+                                    <div class="timeline-bar bar-america-norte" style="left: 92%; width: 7%;" data-civilization="maya"></div>
+                                    <div class="civilization-tooltip">
+                                        <h4>Maya Clásico</h4>
+                                        <p><strong>Período:</strong> 250 d.C. - 900 d.C.</p>
+                                        <p><strong>Región:</strong> Mesoamérica (Guatemala, México, Belice)</p>
+                                        <p><strong>Características:</strong> Escritura jeroglífica, astronomía avanzada, arquitectura compleja</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Más continentes seguirían el mismo patrón -->
+                </div>
+                
+                <div class="scale-indicator">
+                    <span>10000 a.C.</span>
+                    <span>750 d.C.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p>Atlas de Civilizaciones Antiguas v1.0</p>
+                    <p><i class="fas fa-calendar-alt"></i> Rango temporal: 10,000 a.C. - 750 d.C.</p>
+                </div>
+                <div class="footer-credits">
+                    <p><i class="fas fa-code"></i> Desarrollado con <span class="heart">❤</span></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Componente de notificaciones -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Bibliotecas externas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    
+    <!-- Scripts básicos requeridos -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+
+    <script>
+        // Script específico para esta visualización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referencia a elementos importantes
+            const continentFilter = document.getElementById('continent-filter');
+            const highlightFilter = document.getElementById('highlight-filter');
+            const zoomInBtn = document.getElementById('zoom-in-btn');
+            const zoomOutBtn = document.getElementById('zoom-out-btn');
+            const resetZoomBtn = document.getElementById('reset-zoom-btn');
+            
+            // Manejador para filtro de continentes
+            if (continentFilter) {
+                continentFilter.addEventListener('change', function() {
+                    const selectedContinent = this.value;
+                    
+                    // Mostrar/ocultar continentes según selección
+                    document.querySelectorAll('.continent-timeline').forEach(timeline => {
+                        if (selectedContinent === 'all' || timeline.id === `${selectedContinent}-timeline`) {
+                            timeline.style.display = 'block';
+                        } else {
+                            timeline.style.display = 'none';
+                        }
+                    });
+                    
+                    // Mostrar mensaje de notificación
+                    if (selectedContinent !== 'all') {
+                        showNotification(
+                            'Filtro aplicado',
+                            `Mostrando solo civilizaciones de ${getContinentName(selectedContinent)}`,
+                            'info',
+                            'filter'
+                        );
+                    }
+                });
+            }
+            
+            // Manejador para destacar características
+            if (highlightFilter) {
+                highlightFilter.addEventListener('change', function() {
+                    const feature = this.value;
+                    
+                    // Desactivar destacado previo
+                    document.querySelectorAll('.timeline-bar').forEach(bar => {
+                        bar.style.opacity = '1';
+                        bar.style.height = '20px';
+                    });
+                    
+                    // Si no hay selección, salir
+                    if (feature === 'none') return;
+                    
+                    // Destacar las civilizaciones con la característica seleccionada
+                    // Esto es solo una simulación, en la implementación real
+                    // necesitarías los datos reales para identificar qué civilizaciones destacar
+                    const civilizationsWithFeature = {
+                        'writing': ['egipto', 'mesopotamia', 'china', 'maya'],
+                        'architecture': ['egipto', 'mesopotamia', 'maya', 'teotihuacan'],
+                        'technology': ['china', 'mesopotamia', 'nok'],
+                        'social': ['egipto', 'china', 'maya', 'teotihuacan', 'mesopotamia']
+                    };
+                    
+                    // Atenuar todas las civilizaciones
+                    document.querySelectorAll('.timeline-bar').forEach(bar => {
+                        bar.style.opacity = '0.3';
+                    });
+                    
+                    // Destacar las seleccionadas
+                    if (civilizationsWithFeature[feature]) {
+                        civilizationsWithFeature[feature].forEach(civId => {
+                            const bar = document.querySelector(`.timeline-bar[data-civilization="${civId}"]`);
+                            if (bar) {
+                                bar.style.opacity = '1';
+                                bar.style.height = '24px';
+                                bar.style.zIndex = '10';
+                            }
+                        });
+                    }
+                    
+                    // Mostrar notificación
+                    showNotification(
+                        'Característica destacada',
+                        `Destacando civilizaciones con ${getFeatureName(feature)}`,
+                        'info',
+                        'highlighter'
+                    );
+                });
+            }
+            
+            // Controles de zoom
+            if (zoomInBtn && zoomOutBtn && resetZoomBtn) {
+                let currentZoom = 1;
+                const timelineContainer = document.querySelector('.timeline-global-container');
+                
+                zoomInBtn.addEventListener('click', function() {
+                    if (currentZoom < 3) {
+                        currentZoom += 0.5;
+                        timelineContainer.style.width = `${currentZoom * 100}%`;
+                    }
+                });
+                
+                zoomOutBtn.addEventListener('click', function() {
+                    if (currentZoom > 1) {
+                        currentZoom -= 0.5;
+                        timelineContainer.style.width = `${currentZoom * 100}%`;
+                    }
+                });
+                
+                resetZoomBtn.addEventListener('click', function() {
+                    currentZoom = 1;
+                    timelineContainer.style.width = '100%';
+                });
+            }
+            
+            // Función para obtener nombre de continente
+            function getContinentName(continentId) {
+                const names = {
+                    'africa': 'África',
+                    'asia': 'Asia',
+                    'europa': 'Europa',
+                    'america-norte': 'América del Norte',
+                    'america-sur': 'América del Sur',
+                    'oceania': 'Oceanía'
+                };
+                return names[continentId] || continentId;
+            }
+            
+            // Función para obtener nombre de característica
+            function getFeatureName(featureId) {
+                const names = {
+                    'writing': 'sistemas de escritura',
+                    'architecture': 'arquitectura monumental',
+                    'technology': 'tecnologías clave',
+                    'social': 'organización estatal'
+                };
+                return names[featureId] || featureId;
+            }
+            
+            // Función para mostrar notificaciones
+            function showNotification(title, message, type = 'info', icon = 'info-circle') {
+                const container = document.getElementById('notification-container');
+                
+                if (!container) return;
+                
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                
+                notification.innerHTML = `
+                    <div class="notification-icon">
+                        <i class="fas fa-${icon}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">${title}</div>
+                        <div class="notification-message">${message}</div>
+                    </div>
+                    <div class="notification-close">
+                        <i class="fas fa-times"></i>
+                    </div>
+                `;
+                
+                container.appendChild(notification);
+                
+                const closeBtn = notification.querySelector('.notification-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        notification.classList.add('fade-out');
+                        setTimeout(() => {
+                            container.removeChild(notification);
+                        }, 300);
+                    });
+                }
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.classList.add('fade-out');
+                        setTimeout(() => {
+                            if (notification.parentNode) {
+                                container.removeChild(notification);
+                            }
+                        }, 300);
+                    }
+                }, 4000);
+            }
+
+            // Mostrar notificación inicial
+            setTimeout(() => {
+                showNotification(
+                    'Cronología Global',
+                    'Explora las barras temporales de cada civilización. Utiliza los filtros para destacar continentes o características específicas.',
+                    'info',
+                    'clock'
+                );
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
